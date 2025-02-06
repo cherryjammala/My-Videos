@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Genially Embed with Timer Sync</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #000000;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.8);
+        }
+
+        .play-btn, .reset-btn {
+            background-color: white;
+            color: black;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 3px;
+        }
+
+        .play-btn img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .timer {
+            font-size: 16px;
+            color: #f0f0f0;
+            font-weight: bold;
+        }
+
+        .progress-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background-color: #333;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #00ff00;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <iframe title="WYC" src="https://view.genially.com/679b4816b54493165c49a6f0" 
+                allowscriptaccess="always" allowfullscreen="true" scrolling="yes"></iframe>
+
+        <!-- Player bar overlay -->
+        <div class="player-bar">
+            <button class="play-btn" onclick="togglePlay()">
+                <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png" alt="Play Icon">
+            </button>
+            <span class="timer" id="timer">00:00 / 00:20</span>
+            <button class="reset-btn" onclick="resetPlayer()">Reset</button>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        let isPlaying = false;
+        let elapsedTime = 0;
+        const totalDuration = 20; // 20 seconds
+        let interval;
+
+        function togglePlay() {
+            const playButton = document.querySelector('.play-btn img');
+            if (!isPlaying) {
+                playButton.src = "https://cdn-icons-png.flaticon.com/512/727/727240.png"; // Pause icon
+                interval = setInterval(updateTimerAndProgress, 1000);
+                console.log('Play video triggered.');
+            } else {
+                playButton.src = "https://cdn-icons-png.flaticon.com/512/727/727245.png"; // Play icon
+                clearInterval(interval);
+                console.log('Pause video triggered.');
+            }
+            isPlaying = !isPlaying;
+        }
+
+        function updateTimerAndProgress() {
+            if (elapsedTime < totalDuration) {
+                elapsedTime++;
+                updateDisplay();
+                // Update progress bar
+                const progressPercentage = (elapsedTime / totalDuration) * 100;
+                document.getElementById('progress-bar').style.width = progressPercentage + '%';
+            } else {
+                clearInterval(interval);
+                isPlaying = false;
+                document.querySelector('.play-btn img').src = "https://cdn-icons-png.flaticon.com/512/727/727245.png"; // Switch to play icon
+                console.log('Playback ended.');
+            }
+        }
+
+        function updateDisplay() {
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            document.getElementById('timer').textContent = 
+                `${padZero(minutes)}:${padZero(seconds)} / 00:20`;
+        }
+
+        function resetPlayer() {
+            clearInterval(interval);
+            elapsedTime = 0;
+            isPlaying = false;
+            updateDisplay();
+            document.getElementById('progress-bar').style.width = '0%';
+            document.querySelector('.play-btn img').src = "https://cdn-icons-png.flaticon.com/512/727/727245.png"; // Reset to play icon
+            console.log('Player reset.');
+        }
+
+        function padZero(num) {
+            return num < 10 ? '0' + num : num;
+        }
+    </script>
+
+</body>
+</html>
